@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Quick Translate",
+  "version": "1.0",
+  "description": "Dịch nhanh văn bản với cú pháp /n text /n",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://generativelanguage.googleapis.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["popup.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "action": {
+    "default_popup": "options.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
