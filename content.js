@@ -42,6 +42,9 @@ document.addEventListener("input", async (e) => {
       return;
     }
 
+    // Hiện loading popup
+    showLoadingPopup();
+
     // Gọi API dịch
     translateText(textToTranslate, apiKey, targetLang, matchStart, matchEnd);
   }
@@ -164,6 +167,38 @@ async function translateText(text, apiKey, targetLang, matchStart, matchEnd) {
   } catch (error) {
     showPopup("❌ Lỗi kết nối: " + error.message, null, matchStart, matchEnd);
   }
+}
+
+function showLoadingPopup() {
+  // Xóa popup cũ nếu có
+  if (currentPopup) {
+    currentPopup.remove();
+  }
+
+  // Tạo loading popup
+  const popup = document.createElement("div");
+  popup.className = "translate-popup translate-loading";
+  popup.innerHTML = `
+    <div class="translate-popup-content">
+      <div class="translate-spinner"></div>
+      <div class="translate-text">Đang dịch...</div>
+    </div>
+  `;
+
+  // Định vị popup gần element đang focus
+  if (activeElement) {
+    const rect = activeElement.getBoundingClientRect();
+    popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+    popup.style.left = `${rect.left + window.scrollX}px`;
+  } else {
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%)";
+    popup.style.position = "fixed";
+  }
+
+  document.body.appendChild(popup);
+  currentPopup = popup;
 }
 
 function showPopup(translatedText, originalText, matchStart, matchEnd) {
