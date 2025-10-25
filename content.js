@@ -175,46 +175,54 @@ function showTranslationPopup(rect, inputElement = null) {
     </div>
   `;
 
+  // Ẩn để đo
+  translationPopup.style.visibility = "hidden";
+  translationPopup.style.position = "absolute";
+  translationPopup.style.top = "0";
+  translationPopup.style.left = "0";
   document.body.appendChild(translationPopup);
 
-  // Tính toán vị trí popup - ƯU TIÊN TRÊN/DƯỚI
-  let top, left;
+  requestAnimationFrame(() => {
+    const popupRect = translationPopup.getBoundingClientRect();
+    const popupWidth = popupRect.width;
+    const popupHeight = popupRect.height;
 
-  if (inputElement) {
+    const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const scrollX = window.scrollX;
     const scrollY = window.scrollY;
 
-    const popupHeight = 80; // Ước tính chiều cao popup
+    let top, left;
 
-    // Thử hiện phía dưới trước
-    if (rect.bottom - scrollY + popupHeight + 20 < viewportHeight) {
+    if (inputElement) {
+      const safetyMargin = 60; // ⚡ khoảng cách “cao siêu” hơn để không che chat box
+
+      // Mặc định hiển thị dưới
       top = rect.bottom + scrollY + 8;
       left = rect.left + scrollX;
-    }
-    // Nếu không đủ chỗ phía dưới, hiện phía trên
-    else {
-      top = rect.top + scrollY - popupHeight - 8;
-      left = rect.left + scrollX;
+
+      // Nếu tràn dưới → chuyển lên + thêm khoảng cách
+      if (rect.bottom + popupHeight + 20 > viewportHeight) {
+        top = rect.top + scrollY - popupHeight - safetyMargin;
+      }
+
+      // Giới hạn ngang
+      if (left + popupWidth > viewportWidth + scrollX - 10) {
+        left = viewportWidth + scrollX - popupWidth - 10;
+      }
+      if (left < scrollX + 10) {
+        left = scrollX + 10;
+      }
+    } else {
+      top = rect.top + window.scrollY - popupHeight - 8;
+      left = rect.left + window.scrollX;
     }
 
-    // Đảm bảo không bị tràn ngang
-    const popupWidth = 250;
-    if (left + popupWidth > window.innerWidth + scrollX) {
-      left = window.innerWidth + scrollX - popupWidth - 10;
-    }
-    if (left < scrollX + 10) {
-      left = scrollX + 10;
-    }
-  } else {
-    // Hiện phía trên text được bôi đen
-    top = rect.top + window.scrollY - 80;
-    left = rect.left + window.scrollX;
-  }
-
-  translationPopup.style.top = `${top}px`;
-  translationPopup.style.left = `${left}px`;
-  translationPopup.style.opacity = "1";
+    translationPopup.style.top = `${top}px`;
+    translationPopup.style.left = `${left}px`;
+    translationPopup.style.visibility = "visible";
+    translationPopup.style.opacity = "1";
+  });
 }
 
 function requestTranslation(text) {
