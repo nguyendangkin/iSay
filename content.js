@@ -177,30 +177,39 @@ function showTranslationPopup(rect, inputElement = null) {
 
   document.body.appendChild(translationPopup);
 
-  // Tính toán vị trí popup
+  // Tính toán vị trí popup - ƯU TIÊN TRÊN/DƯỚI
   let top, left;
 
   if (inputElement) {
-    // Hiện phía dưới input
-    top = rect.bottom + window.scrollY + 10;
-    left = rect.left + window.scrollX;
+    const viewportHeight = window.innerHeight;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
 
-    // Nếu quá sát đáy màn hình, hiện phía trên
-    if (top + 100 > window.innerHeight + window.scrollY) {
-      top = rect.top + window.scrollY - 80;
+    const popupHeight = 80; // Ước tính chiều cao popup
+
+    // Thử hiện phía dưới trước
+    if (rect.bottom - scrollY + popupHeight + 20 < viewportHeight) {
+      top = rect.bottom + scrollY + 8;
+      left = rect.left + scrollX;
+    }
+    // Nếu không đủ chỗ phía dưới, hiện phía trên
+    else {
+      top = rect.top + scrollY - popupHeight - 8;
+      left = rect.left + scrollX;
+    }
+
+    // Đảm bảo không bị tràn ngang
+    const popupWidth = 250;
+    if (left + popupWidth > window.innerWidth + scrollX) {
+      left = window.innerWidth + scrollX - popupWidth - 10;
+    }
+    if (left < scrollX + 10) {
+      left = scrollX + 10;
     }
   } else {
     // Hiện phía trên text được bôi đen
     top = rect.top + window.scrollY - 80;
     left = rect.left + window.scrollX;
-  }
-
-  // Đảm bảo không bị tràn màn hình
-  if (left + 350 > window.innerWidth) {
-    left = window.innerWidth - 360;
-  }
-  if (left < 10) {
-    left = 10;
   }
 
   translationPopup.style.top = `${top}px`;
@@ -257,6 +266,13 @@ document.addEventListener("mousedown", (e) => {
 // Ẩn popup khi nhấn ESC
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && translationPopup) {
+    hidePopup();
+  }
+});
+
+// Ẩn popup sau khi người dùng nhấn Ctrl+V để dán
+document.addEventListener("paste", () => {
+  if (translationPopup) {
     hidePopup();
   }
 });
