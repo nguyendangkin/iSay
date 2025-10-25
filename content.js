@@ -21,7 +21,7 @@ document.addEventListener(
       const text = target.value || target.textContent || "";
 
       // Kiểm tra pattern: ]\text]\
-      const match = text.match(/\]\\([^\]\\]+)\]\\/);
+      const match = text.match(/\]\\([^\]\\]+)\]\\$/);
 
       if (match && match[1]) {
         const textToTranslate = match[1].trim();
